@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Portal & Device Simulator — Earthquake Alert Indonesia</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Leaflet.js CSS (Map visualization) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Vanilla CSS styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="portal-container">
+        <!-- LEFT: Mobile Phone Simulator -->
+        <section class="simulator-section">
+            <div class="section-badge">Simulator Device</div>
+            <div class="iphone-frame">
+                <!-- Bezel elements -->
+                <div class="iphone-camera"></div>
+                <div class="iphone-speaker"></div>
+                
+                <!-- Phone Screen -->
+                <div class="iphone-screen">
+                    <!-- Status Bar -->
+                    <div class="status-bar">
+                        <span id="phone-time">17:20</span>
+                        <div class="status-icons">
+                            <span class="icon-wifi">📶</span>
+                            <span class="icon-battery">🔋 98%</span>
+                        </div>
+                    </div>
+
+                    <!-- Push Notification Banner Container -->
+                    <div id="push-notification-banner" class="push-banner hidden">
+                        <div class="banner-icon">🌋</div>
+                        <div class="banner-content">
+                            <h4 id="banner-title">Gempa M 5.2</h4>
+                            <p id="banner-text">Berpotensi dirasakan di Jakarta.</p>
+                        </div>
+                        <span class="banner-close">&times;</span>
+                    </div>
+
+                    <!-- Main App Content (Dynamic Views) -->
+                    <div id="app-body" class="app-body">
+                        <!-- HOME VIEW (Default) -->
+                        <div id="view-home" class="app-view active">
+                            <header class="app-header">
+                                <h1>Earthquake Alert</h1>
+                                <span class="subtitle">Indonesia</span>
+                            </header>
+                            
+                            <div class="monitoring-status-card card">
+                                <div class="pulse-indicator">
+                                    <div class="double-pulse"></div>
+                                    <span class="pulse-dot"></span>
+                                </div>
+                                <div class="status-text-container">
+                                    <h3 id="app-state-title">🟢 Alert Active</h3>
+                                    <p id="app-state-desc">Memantau data resmi BMKG</p>
+                                </div>
+                            </div>
+
+                            <div class="section-title">Lokasi Pantauan</div>
+                            <div id="monitored-locations-list" class="locations-grid">
+                                <!-- Locations injected here -->
+                            </div>
+
+                            <div class="section-title">Gempa Relevan Terbaru</div>
+                            <div id="relevant-earthquake-card" class="card empty-card">
+                                <div class="empty-icon">🌋</div>
+                                <p>Belum ada gempa relevan yang terdeteksi di lokasi pantauan Anda.</p>
+                            </div>
+
+                            <div class="section-title">Riwayat Gempa Bumi</div>
+                            <div class="history-tabs">
+                                <button id="tab-history-felt" class="history-tab-btn active">Dirasakan</button>
+                                <button id="tab-history-m5" class="history-tab-btn">M 5.0+</button>
+                            </div>
+                            <div id="history-list" class="history-list">
+                                <!-- History items will be injected here -->
+                            </div>
+                        </div>
+
+                        <!-- MAP VIEW -->
+                        <div id="view-map" class="app-view">
+                            <header class="app-header compact">
+                                <h2>Peta Gempa</h2>
+                            </header>
+                            <div id="phone-map" class="map-container"></div>
+                            <div class="map-legend">
+                                <span class="legend-item"><span class="legend-dot red"></span> M &ge; 6.0</span>
+                                <span class="legend-item"><span class="legend-dot orange"></span> M 4.0 - 5.9</span>
+                                <span class="legend-item"><span class="legend-dot yellow"></span> M &lt; 4.0</span>
+                            </div>
+                        </div>
+
+                        <!-- SETTINGS VIEW -->
+                        <div id="view-settings" class="app-view">
+                            <header class="app-header compact">
+                                <h2>Pengaturan</h2>
+                            </header>
+
+                            <div class="settings-group card">
+                                <div class="setting-item">
+                                    <div class="setting-label">
+                                        <h4>Notifikasi Push</h4>
+                                        <p>Terima peringatan saat gempa terjadi</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="toggle-notifications" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="settings-group card">
+                                <div class="setting-header-inline">
+                                    <h3>Lokasi Pantauan (Maks 5)</h3>
+                                    <button id="btn-add-location" class="btn-small">+ Tambah</button>
+                                </div>
+                                <div id="settings-locations-list" class="settings-list">
+                                    <!-- Monitored Locations list for management -->
+                                </div>
+                            </div>
+
+                            <div class="settings-group card">
+                                <h3>Informasi Aplikasi</h3>
+                                <div class="about-item">
+                                    <span>Sumber Data:</span>
+                                    <strong>BMKG (Data Terbuka)</strong>
+                                </div>
+                                <div class="about-item">
+                                    <span>Versi:</span>
+                                    <strong>v1.0.0 (MVP)</strong>
+                                </div>
+                                <button id="btn-show-disclaimer" class="btn-outline btn-full">Baca Disclaimer Resmi</button>
+                            </div>
+                        </div>
+
+                        <!-- DETAILS VIEW -->
+                        <div id="view-detail" class="app-view">
+                            <div class="back-nav">
+                                <button id="btn-back-to-home" class="btn-back">&larr; Kembali</button>
+                            </div>
+                            <div id="detail-content-container">
+                                <!-- Detailed earthquake injected here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Tab Navigation -->
+                    <nav class="app-nav">
+                        <button class="nav-tab active" data-view="home">
+                            <span class="tab-icon">🏠</span>
+                            <span class="tab-text">Home</span>
+                        </button>
+                        <button class="nav-tab" data-view="map">
+                            <span class="tab-icon">🗺️</span>
+                            <span class="tab-text">Map</span>
+                        </button>
+                        <button class="nav-tab" data-view="settings">
+                            <span class="tab-icon">⚙️</span>
+                            <span class="tab-text">Settings</span>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT: Developer Admin Console & Trigger Control -->
+        <section class="admin-section">
+            <div class="admin-header">
+                <div>
+                    <h2>Developer Control Panel</h2>
+                    <p class="admin-subtitle">Monitoring API server & Simulasi Trigger BMKG</p>
+                </div>
+                <div class="connection-status badge-active" id="backend-status">
+                    Backend: Connected
+                </div>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="dashboard-stats">
+                <div class="stat-box">
+                    <span class="stat-title">Subscribers SSE</span>
+                    <span class="stat-value" id="stat-sse-clients">1</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-title">Device Registered</span>
+                    <span class="stat-value" id="stat-devices">1</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-title">Locations Tracked</span>
+                    <span class="stat-value" id="stat-locations">2</span>
+                </div>
+            </div>
+
+            <!-- Form: Inject Custom Earthquake -->
+            <div class="control-card card">
+                <h3>Trigger Simulasi Gempabumi BMKG</h3>
+                <p class="card-desc">Kirim event gempa palsu ke backend untuk menguji logic alert matching dan push notification real-time.</p>
+                
+                <div class="form-row">
+                    <label for="mock-presets">Gunakan Skenario Preset:</label>
+                    <select id="mock-presets">
+                        <option value="">-- Pilih Skenario Gempa --</option>
+                        <option value="sunda_felt">🌋 M 5.2 - Selat Sunda (Dirasakan di Jakarta & Sukabumi)</option>
+                        <option value="megathrust">🚨 M 8.1 - Megathrust Jawa Tengah (Potensi Tsunami & Dirasa Luas)</option>
+                        <option value="wamena">🌋 M 4.1 - Wamena Barat Laut (Dirasakan di Wamena)</option>
+                        <option value="unfelt">🟡 M 3.4 - Bengkulu Selatan (Tidak Dirasakan/Kecil)</option>
+                    </select>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label for="input-magnitude">Magnitude (M)</label>
+                        <input type="number" id="input-magnitude" step="0.1" min="1.0" max="10.0" value="5.2">
+                    </div>
+                    <div class="form-row">
+                        <label for="input-depth">Kedalaman (km)</label>
+                        <input type="number" id="input-depth" min="1" max="1000" value="20">
+                    </div>
+                    <div class="form-row">
+                        <label for="input-lat">Latitude (LS/LU)</label>
+                        <input type="number" id="input-lat" step="0.0001" min="-15" max="10" value="-6.2000">
+                    </div>
+                    <div class="form-row">
+                        <label for="input-lng">Longitude (BT)</label>
+                        <input type="number" id="input-lng" step="0.0001" min="95" max="145" value="105.8000">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="input-region">Wilayah Pusat Gempa (Region)</label>
+                    <input type="text" id="input-region" placeholder="Contoh: Selat Sunda, Wamena" value="Selat Sunda">
+                </div>
+
+                <div class="form-row">
+                    <label for="input-desc">Deskripsi Wilayah BMKG (Wilayah)</label>
+                    <input type="text" id="input-desc" placeholder="Contoh: Pusat gempa berada di laut 20km Barat Daya..." value="Pusat gempa berada di laut 25 km barat daya Sumur">
+                </div>
+
+                <div class="form-row">
+                    <label for="input-potensi">Potensi Tsunami</label>
+                    <select id="input-potensi">
+                        <option value="Tidak berpotensi tsunami">Tidak berpotensi tsunami</option>
+                        <option value="POTENSI TSUNAMI Waspada/Siaga">POTENSI TSUNAMI (Waspada/Siaga)</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="input-felt">Area Dirasakan (MMI)</label>
+                    <input type="text" id="input-felt" placeholder="Contoh: III Jakarta, IV Sukabumi, II Bandung" value="III Jakarta, III Sukabumi, II Banten">
+                </div>
+
+                <button id="btn-trigger-mock" class="btn-primary btn-full">Trigger Peringatan Gempa</button>
+            </div>
+
+            <!-- Logs Terminal -->
+            <div class="terminal-card card">
+                <div class="terminal-header">
+                    <span>Logs Console & Alert Engine Logs</span>
+                    <button id="btn-clear-logs" class="btn-clear">Clear</button>
+                </div>
+                <div id="terminal-body" class="terminal-body">
+                    <div class="log-line system">[SYSTEM] Developer portal initialized. Connecting to SSE...</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modals (Add Location & Disclaimer) -->
+    <div id="modal-add-location" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Tambah Lokasi Pantauan</h3>
+                <span class="modal-close" id="modal-add-close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="modal-tabs">
+                    <button class="modal-tab-btn active" data-tab="gps">Gunakan GPS</button>
+                    <button class="modal-tab-btn" data-tab="manual">Pilih Wilayah Manual</button>
+                </div>
+
+                <div id="tab-gps" class="modal-tab-content active">
+                    <p class="tab-desc">Aplikasi akan mengambil latitude & longitude dari GPS browser Anda untuk mensimulasikan GPS perangkat.</p>
+                    <div class="gps-preview">
+                        <div class="gps-status">Status GPS: <span id="gps-status-text" class="warning">Ready</span></div>
+                        <div class="gps-coords">
+                            Lat: <strong id="gps-lat">-</strong> | Lng: <strong id="gps-lng">-</strong>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="gps-loc-name">Nama Lokasi (Label)</label>
+                        <input type="text" id="gps-loc-name" value="Current Location">
+                    </div>
+                    <button id="btn-save-gps" class="btn-primary btn-full">Simpan Lokasi GPS</button>
+                </div>
+
+                <div id="tab-manual" class="modal-tab-content">
+                    <p class="tab-desc">Pilih provinsi dan kabupaten/kota secara manual dari basis data regional Indonesia.</p>
+                    <div class="form-row">
+                        <label for="select-province">Provinsi</label>
+                        <select id="select-province">
+                            <option value="">-- Pilih Provinsi --</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="select-city">Kabupaten / Kota</label>
+                        <select id="select-city" disabled>
+                            <option value="">-- Pilih Kota --</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="manual-loc-name">Nama Lokasi (Label)</label>
+                        <input type="text" id="manual-loc-name" placeholder="Contoh: Rumah, Kantor">
+                    </div>
+                    <button id="btn-save-manual" class="btn-primary btn-full" disabled>Simpan Lokasi Manual</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-disclaimer" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Disclaimer Aplikasi</h3>
+                <span class="modal-close" id="modal-disclaimer-close">&times;</span>
+            </div>
+            <div class="modal-body disclaimer-text">
+                <p><strong>Penting untuk Diperhatikan:</strong></p>
+                <p>1. Aplikasi ini <strong>BUKAN</strong> merupakan alat prediksi gempa bumi. Secara ilmiah, kejadian gempa bumi tidak dapat diprediksi waktunya sebelum terjadi.</p>
+                <p>2. Informasi gempa bumi dan tsunami yang disalurkan melalui aplikasi ini bersumber langsung dari data terbuka (open data) milik <strong>Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) Indonesia</strong>.</p>
+                <p>3. Peringatan / alert yang dikirimkan didasarkan pada kalkulasi matematis terhadap felt area (daerah dirasakan) yang dikeluarkan BMKG dan estimasi radius jarak geospasial.</p>
+                <p>4. Aplikasi ini disediakan "seadanya" untuk tujuan informasi masyarakat. Dalam kondisi darurat sesungguhnya, selalu utamakan keselamatan jiwa dan ikuti arahan langsung dari otoritas setempat (BMKG, BNPB, dan pemerintah daerah).</p>
+                <br>
+                <button id="btn-close-disclaimer-ok" class="btn-primary btn-full">Saya Mengerti</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet.js script (Map visualization) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Code logic dependencies -->
+    <script src="simulator.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
