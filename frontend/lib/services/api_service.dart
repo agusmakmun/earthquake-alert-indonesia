@@ -2,8 +2,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  // Use Mac's local network IP for physical iOS testing over the same Wi-Fi network
-  static String baseUrl = 'http://192.168.1.4:8000'; 
+  // Cloudflare Workers endpoint
+  // Replace YOUR_WORKER_NAME with your actual Cloudflare Workers deployment name
+  static String baseUrl = 'https://YOUR_WORKER_NAME.YOUR_ACCOUNT.workers.dev';
+  
+  // For local development:
+  // static String baseUrl = 'http://127.0.0.1:8787'; // wrangler dev 
 
   static Future<Map<String, dynamic>?> registerDevice(String installationId, String platform) async {
     try {

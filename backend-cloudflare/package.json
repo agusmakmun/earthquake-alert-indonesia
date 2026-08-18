@@ -1,0 +1,23 @@
+{
+  "name": "earthquake-alert-indonesia-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Workers backend for Earthquake Alert Indonesia",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "jest"
+  },
+  "keywords": ["earthquake", "alerts", "bmkg", "cloudflare"],
+  "author": "Agus Makmun",
+  "license": "MIT",
+  "dependencies": {
+    "hono": "^3.7.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.50.0",
+    "@cloudflare/workers-types": "^4.20240605.0",
+    "jest": "^29.7.0"
+  }
+}

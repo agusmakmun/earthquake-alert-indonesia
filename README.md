@@ -6,28 +6,27 @@ Earthquake Alert Indonesia is a real-time Earthquake Early Warning (EEW) applica
 
 ## 1. Project Architecture
 
-The system uses a database-less architecture designed to run lightweight and fast:
-* **Background Worker**: Periodically checks BMKG open JSON APIs (`autogempa`, `gempadirasakan`, `gempaterkini`) every 30 seconds.
+The system uses a serverless, database-less architecture designed to run globally with zero maintenance:
+* **Cloudflare Workers**: Runs on Cloudflare's global edge network (Jakarta location for Indonesian users).
+* **Cron Triggers**: Periodically checks BMKG open JSON APIs (`autogempa`, `gempadirasakan`, `gempaterkini`) every 1 minute.
 * **Alert Engine**: Evaluates incoming events against user registered coordinates using a hybrid priority rule:
   1. **Felt-Area Text Matching**: Regex parses the felt description (e.g. `"III Jakarta"`) and matches user locations (e.g. `"Jakarta Pusat"`).
   2. **Haversine Proximity Check**: Fallback distance checks matching coordinates to magnitude-based radius limits.
-* **Persistent Registry**: Stores devices, monitoring locations, and notification history locally in a thread-safe `devices.json` file.
+* **Cloudflare KV Storage**: Distributed key-value store for devices, monitoring locations, and notification history.
 * **SSE Stream**: Server-Sent Events channel (`/api/v1/stream`) to broadcast instant alerts to connected simulator clients.
+* **Free Tier**: 100,000 requests/day, KV 100,000 reads/day — more than enough for personal/community use.
 
 ---
 
 ## 2. Directory Structure
 
 ```text
-├── backend/                   # FastAPI backend server
-│   ├── app/
-│   │   ├── main.py            # API routing & SSE server
-│   │   ├── config.py          # Port & URL constant configuration
-│   │   ├── worker.py          # BMKG Polling loop
-│   │   ├── alert_engine.py    # Proximity & text MMI logic
-│   │   ├── storage.py         # devices.json CRUD wrapper
-│   │   └── seed_data.py       # Indonesian city centroids
-│   └── tests/                 # Pytest engine test suites
+├── src/                       # Cloudflare Workers backend
+│   ├── index.js               # Main handler (REST endpoints, SSE, Cron)
+│   ├── storage.js             # KV storage abstraction
+│   ├── alertEngine.js         # Proximity & felt area matching logic
+│   ├── bmkg.js                # BMKG API polling & parsing
+│   └── seedData.js            # Indonesian province/city centroids
 │
 ├── frontend/                  # Cross-platform mobile codebase
 │   ├── lib/
@@ -41,7 +40,12 @@ The system uses a database-less architecture designed to run lightweight and fas
 │   ├── style.css              # Glassmorphic bezels styling
 │   └── simulator.js           # EventSource stream connection
 │
-└── devices.json               # Local persistent database file
+├── backend/                   # (Legacy) FastAPI reference (kept for reference only)
+│   └── ...                    # Superseded by Cloudflare Workers (src/)
+│
+├── wrangler.toml              # Cloudflare Workers configuration
+├── package.json               # Node.js dependencies
+└── CLOUDFLARE_MIGRATION.md    # Deployment & setup guide
 ```
 
 ---
@@ -49,75 +53,83 @@ The system uses a database-less architecture designed to run lightweight and fas
 ## 3. Getting Started
 
 ### Prerequisites
-* Python 3.10+
-* Flutter SDK (for mobile compilation)
+* Node.js 18+ (for Cloudflare Workers development)
+* Wrangler CLI (`npm install -g wrangler`)
+* Cloudflare account (free tier works fine)
+* Flutter SDK (for mobile development)
 * Xcode / CocoaPods (for iOS compilation)
 
-### 1. Launch the Backend Server
-Setup the virtual environment, install requirements, and run the backend server:
+### 1. Deploy the Backend (Cloudflare Workers)
+
+**For detailed deployment instructions**, see [CLOUDFLARE_MIGRATION.md](CLOUDFLARE_MIGRATION.md).
+
+Quick start:
 ```bash
-# Navigate to the workspace root
-cd earthquake-early-warning
+# Install dependencies
+npm install
 
-# Create virtual environment and install packages
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r backend/requirements.txt   # Or pip install fastapi uvicorn requests pydantic pytest
+# Authenticate with Cloudflare
+wrangler login
 
-# Run the server
-PYTHONPATH=. .venv/bin/uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+# Create a KV namespace for device storage
+wrangler kv:namespace create DEVICES_KV
+
+# Update wrangler.toml with the KV namespace ID
+# Then test locally:
+wrangler dev
+
+# Deploy to production:
+wrangler deploy
 ```
 
-### 2. Run the Web Simulator & Developer Console
-Open your web browser and go to:
-* **Simulator Portal**: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+Your backend will be live at: `https://YOUR_WORKER_NAME.YOUR_ACCOUNT.workers.dev`
 
-Here you can:
-* Use the **Simulated Phone** on the left to CRUD settings, add locations, and view map epicenters.
-* Use the **Developer Panel** on the right to choose presets (e.g. `sunda_felt`) and trigger mock earthquakes to test alert matching.
+### 2. Configure the Flutter Frontend
 
-### 3. Run Automated Tests
-Execute the test suites verifying alert matching and coordinates distance calculations:
-```bash
-PYTHONPATH=. .venv/bin/pytest backend/tests/
+Update `frontend/lib/services/api_service.dart`:
+```dart
+class ApiService {
+  static String baseUrl = 'https://YOUR_WORKER_NAME.YOUR_ACCOUNT.workers.dev';
+}
 ```
+
+### 3. Build & Run on Mobile
+
+**iOS Simulator:**
+```bash
+cd frontend
+flutter pub get
+cd ios && pod install && cd ..
+flutter run
+```
+
+**Physical iPhone:**
+1. Ensure iPhone and Mac are on the same Wi-Fi network.
+2. `flutter devices` → copy your iPhone's device ID
+3. `flutter run -d <YOUR_DEVICE_ID>`
 
 ---
 
-## 4. Testing on Native Mobile (iOS/Android)
+## 4. Testing
 
-The Flutter codebase is stored in the `frontend/` directory.
+### Mock Earthquake Endpoint (for testing)
+Trigger a mock earthquake to verify alert matching logic:
+```bash
+curl -X POST https://YOUR_WORKER_NAME.YOUR_ACCOUNT.workers.dev/api/v1/mock/trigger \
+  -H "Content-Type: application/json" \
+  -d '{
+    "magnitude": 5.5,
+    "depth_km": 50,
+    "latitude": -6.2088,
+    "longitude": 106.8456,
+    "location_description": "Selat Sunda",
+    "region": "Jakarta",
+    "dirasakan": "III Jakarta, II Depok"
+  }'
+```
 
-### iOS Simulator
-1. Connect your simulator or open it: `open -a Simulator`
-2. Configure packages and pods:
-   ```bash
-   cd frontend
-   flutter pub get
-   cd ios
-   pod install
-   cd ..
-   ```
-3. Run the application:
-   ```bash
-   flutter run
-   ```
-
-### Physical iPhone
-To compile and deploy to a physical iPhone:
-1. Ensure the iPhone and Mac are on the **same Wi-Fi network**.
-2. Open Xcode: `open frontend/ios/Runner.xcworkspace`
-3. Go to **Signing & Capabilities**, check **Automatically manage signing**, and select your personal Apple ID team.
-4. Run `flutter devices` to copy your iPhone's device ID.
-5. Deploy:
-   ```bash
-   flutter run -d <YOUR_DEVICE_ID>
-   ```
-*(First time runs require trusting your developer certificate under **Settings > General > VPN & Device Management** on your iPhone).*
-
----
-
-## 5. API Reference
+### Local Development
+During development, run `wrangler dev` to test locally at `http://127.0.0.1:8787`.
 
 | Endpoint | Method | Description |
 | :--- | :--- | :--- |

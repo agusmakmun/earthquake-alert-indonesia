@@ -1,0 +1,30 @@
+name = "earthquake-alert-indonesia"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# KV Namespace for device & location storage
+[[kv_namespaces]]
+binding = "DEVICES_KV"
+id = "YOUR_KV_NAMESPACE_ID"
+preview_id = "YOUR_KV_PREVIEW_ID"
+
+# Environment variables
+[env.production]
+vars = { ENVIRONMENT = "production" }
+kv_namespaces = [
+  { binding = "DEVICES_KV", id = "YOUR_KV_NAMESPACE_ID" }
+]
+
+[env.preview]
+vars = { ENVIRONMENT = "preview" }
+kv_namespaces = [
+  { binding = "DEVICES_KV", id = "YOUR_KV_PREVIEW_ID", preview_id = "YOUR_KV_PREVIEW_ID" }
+]
+
+# Cron trigger for BMKG polling (every minute)
+# Format: minute hour day month day-of-week
+[[triggers.crons]]
+cron = "* * * * *"
+
+# Analytics Engine binding
+analytics_engine_datasets = ["earthquakes"]
