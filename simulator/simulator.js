@@ -696,7 +696,7 @@ function setupManualDropdowns() {
     provSelect.addEventListener("change", () => {
         const provId = parseInt(provSelect.value);
         citySelect.innerHTML = '<option value="">-- Pilih Kabupaten / Kota --</option>';
-        saveBtn.disabled = true;
+        saveBtn.disabled = !provId;
         
         if (!provId) {
             citySelect.disabled = true;
@@ -714,7 +714,7 @@ function setupManualDropdowns() {
 
     citySelect.addEventListener("change", () => {
         const cityId = parseInt(citySelect.value);
-        saveBtn.disabled = !cityId;
+        saveBtn.disabled = !provSelect.value;
         
         if (cityId) {
             const selectedCity = citiesList.find(c => c.id === cityId);
@@ -727,17 +727,18 @@ function setupManualDropdowns() {
         const provId = parseInt(provSelect.value);
         const name = document.getElementById("manual-loc-name").value;
         const city = citiesList.find(c => c.id === cityId);
+        const province = provincesList.find(p => p.id === provId);
         
-        if (!city) return;
+        if (!province) return;
         
         try {
             await addLocation({
-                name: name || city.name,
-                type: "city",
-                latitude: city.latitude,
-                longitude: city.longitude,
+                name: name || city?.name || province.name,
+                type: city ? "city" : "province",
+                latitude: city?.latitude || province.latitude,
+                longitude: city?.longitude || province.longitude,
                 province_id: provId,
-                city_id: cityId
+                city_id: city ? cityId : null
             });
             hideModal("modal-add-location");
         } catch (e) {

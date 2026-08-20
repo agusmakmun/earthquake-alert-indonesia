@@ -202,7 +202,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   DropdownButton<dynamic>(
                     isExpanded: true,
                     value: selectedCity,
-                    hint: const Text('Pilih Kota / Kabupaten'),
+                    hint: const Text('Pilih Kota / Kabupaten (opsional)'),
                     disabledHint: const Text('Pilih Provinsi Terlebih Dahulu'),
                     dropdownColor: const Color(0xFF111318),
                     items: filteredCities.map((city) {
@@ -236,18 +236,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: const Text('Batal', style: TextStyle(color: Colors.white54)),
                 ),
                 ElevatedButton(
-                  onPressed: selectedCity == null
+                  onPressed: selectedProvince == null
                       ? null
                       : () async {
+                          final location = selectedCity ?? selectedProvince;
                           Navigator.pop(context);
                           final data = await ApiService.addLocation(
                             widget.installationId,
-                            nameController.text,
-                            'city',
-                            selectedCity['latitude'],
-                            selectedCity['longitude'],
+                            nameController.text.isEmpty ? location['name'] : nameController.text,
+                            selectedCity == null ? 'province' : 'city',
+                            location['latitude'],
+                            location['longitude'],
                             provinceId: selectedProvince['id'],
-                            cityId: selectedCity['id'],
+                            cityId: selectedCity?['id'],
                           );
                           if (data != null) {
                             widget.onRefresh();
