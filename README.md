@@ -51,8 +51,7 @@ The system uses a serverless, database-less architecture designed to run globall
 ## 3. Getting Started
 
 ### Prerequisites
-* Node.js 18+ (for Cloudflare Workers development)
-* Wrangler CLI (`npm install -g wrangler`)
+* Node.js 18+ and pnpm 9+ (for Cloudflare Workers development)
 * Cloudflare account (free tier works fine)
 * Flutter SDK (for mobile development)
 * Xcode / CocoaPods (for iOS compilation)
@@ -137,8 +136,7 @@ curl -X POST https://YOUR_WORKER_NAME.YOUR_ACCOUNT.workers.dev/api/v1/mock/trigg
 From the repository root:
 
 ```bash
-cd backend
-npm install
+pnpm install
 ```
 
 Create `backend/.dev.vars` for the local webhook secret:
@@ -150,10 +148,25 @@ WEBHOOK_SECRET=local-secret
 Start the Worker:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
-It runs at `http://127.0.0.1:8787`. Register a test device, then send an earthquake through the fast webhook path:
+This starts both services:
+
+- Worker API: `http://127.0.0.1:8787`
+- Browser simulator: `http://127.0.0.1:3000`
+
+Open the simulator in a browser, or use the second terminal for API requests. The Flutter app remains a separate process because it uses the Flutter toolchain, not pnpm.
+
+To start the Worker and Flutter app together instead:
+
+```bash
+pnpm dev:mobile
+```
+
+Flutter must be installed and a simulator, emulator, or physical device must be available. Use `pnpm dev` for the browser simulator.
+
+Register a test device, then send an earthquake through the fast webhook path:
 
 ```bash
 curl -X POST http://127.0.0.1:8787/api/v1/devices \

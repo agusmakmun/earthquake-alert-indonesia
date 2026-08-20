@@ -1,0 +1,17 @@
+{
+  "name": "earthquake-alert-indonesia",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --kill-others --names backend,simulator \"pnpm --filter earthquake-alert-indonesia-worker dev\" \"pnpm run dev:simulator\"",
+    "dev:backend": "pnpm --filter earthquake-alert-indonesia-worker dev",
+    "dev:mobile": "concurrently --kill-others --names backend,flutter \"pnpm --filter earthquake-alert-indonesia-worker dev\" \"pnpm run dev:flutter\"",
+    "dev:simulator": "serve simulator -l 3000",
+    "dev:flutter": "cd frontend && flutter run",
+    "install:all": "pnpm install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "serve": "^14.2.4"
+  },
+  "packageManager": "pnpm@9.15.4"
+}
