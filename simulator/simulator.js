@@ -4,6 +4,7 @@
 const simulatorApiUrl = new URL(window.location.origin);
 const simulatorIsLocalHost = ["localhost", "127.0.0.1", "::1"].includes(simulatorApiUrl.hostname);
 const API_BASE = simulatorIsLocalHost ? "http://127.0.0.1:8787" : simulatorApiUrl.origin;
+const RELEVANT_EARTHQUAKE_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
 let installationId = localStorage.getItem("installation_id");
 let isNotificationsEnabled = true;
 let activeView = "home";
@@ -246,25 +247,23 @@ function renderHomeView() {
         });
     }
 
-    // Render latest relevant earthquake card
+    // Render the newest earthquake that matches a monitored location.
     const relevantContainer = document.getElementById("relevant-earthquake-card");
-    
-    // Evaluate if the latest earthquake matches any of our locations
-    let relevantEq = null;
-    if (latestEarthquake && userLocations.length > 0) {
-        for (let loc of userLocations) {
-            if (!loc.enabled) continue;
-            // Proximity calculation or felt match simulation
-            const isFelt = checkMockFeltMatch(loc.name, latestEarthquake.dirasakan);
-            const dist = getHaversineDist(loc.latitude, loc.longitude, latestEarthquake.latitude, latestEarthquake.longitude);
-            const thresh = getDistThresh(latestEarthquake.magnitude);
-            
-            if (isFelt || (dist <= thresh && latestEarthquake.magnitude >= 4.0)) {
-                relevantEq = latestEarthquake;
-                break;
-            }
-        }
-    }
+    const earthquakeCandidates = [
+        latestEarthquake,
+        ...feltEarthquakesList,
+        ...m5EarthquakesList,
+    ].filter(Boolean);
+    const uniqueEarthquakes = [...new Map(
+        earthquakeCandidates.map(earthquake => [earthquake.bmkg_event_id, earthquake])
+    ).values()];
+    const relevantEq = uniqueEarthquakes
+        .filter(earthquake => {
+            const eventTime = new Date(earthquake.event_time).getTime();
+            const eventAge = Date.now() - eventTime;
+            return eventAge >= 0 && eventAge <= RELEVANT_EARTHQUAKE_RETENTION_MS && isEarthquakeRelevant(earthquake);
+        })
+        .sort((first, second) => new Date(second.event_time) - new Date(first.event_time))[0] || null;
 
     if (relevantEq) {
         const isCritical = relevantEq.magnitude >= 6.0 || (relevantEq.tsunami_potential && relevantEq.tsunami_potential.toLowerCase().includes("tsunami"));
@@ -289,6 +288,25 @@ function renderHomeView() {
         `;
     }
     renderHistoryList();
+}
+
+function isEarthquakeRelevant(earthquake) {
+    if (userLocations.length === 0) return false;
+
+    return userLocations.some(location => {
+        if (!location.enabled) return false;
+
+        const isFelt = checkMockFeltMatch(location.name, earthquake.dirasakan);
+        const distance = getHaversineDist(
+            location.latitude,
+            location.longitude,
+            earthquake.latitude,
+            earthquake.longitude
+        );
+        const threshold = getDistThresh(earthquake.magnitude);
+
+        return isFelt || (distance <= threshold && earthquake.magnitude >= 4.0);
+    });
 }
 
 function renderHistoryList() {
