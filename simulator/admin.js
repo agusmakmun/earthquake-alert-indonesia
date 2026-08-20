@@ -3,7 +3,7 @@
 
 const adminApiUrl = new URL(window.location.origin);
 const adminIsLocalHost = ["localhost", "127.0.0.1", "::1"].includes(adminApiUrl.hostname);
-const API_BASE = adminIsLocalHost ? "http://127.0.0.1:8787" : adminApiUrl.origin;
+const ADMIN_API_BASE = adminIsLocalHost ? "http://127.0.0.1:8787" : adminApiUrl.origin;
 
 const PRESETS = {
     sunda_felt: {
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.logConsole(`Triggering mock earthquake: M ${payload.magnitude} in ${payload.region}...`, "warn");
 
         try {
-            const resp = await fetch(`${API_BASE}/api/v1/mock/trigger`, {
+            const resp = await fetch(`${ADMIN_API_BASE}/api/v1/mock/trigger`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Update Developer Dashboard Stats Counter
 async function updateDashboardStats() {
     try {
-        const resp = await fetch(`${API_BASE}/api/v1/admin/stats`);
+        const resp = await fetch(`${ADMIN_API_BASE}/api/v1/admin/stats`);
         if (resp.ok) {
             const data = await resp.json();
             document.getElementById("stat-sse-clients").innerText = data.sse_clients;
