@@ -1,9 +1,9 @@
 // simulator.js
 // Client application logic running inside the simulated mobile device.
 
-const apiUrl = new URL(window.location.origin);
-const isLocalHost = ["localhost", "127.0.0.1", "::1"].includes(apiUrl.hostname);
-const API_BASE = isLocalHost ? "http://127.0.0.1:8787" : apiUrl.origin;
+const simulatorApiUrl = new URL(window.location.origin);
+const simulatorIsLocalHost = ["localhost", "127.0.0.1", "::1"].includes(simulatorApiUrl.hostname);
+const API_BASE = simulatorIsLocalHost ? "http://127.0.0.1:8787" : simulatorApiUrl.origin;
 let installationId = localStorage.getItem("installation_id");
 let isNotificationsEnabled = true;
 let activeView = "home";
@@ -152,7 +152,7 @@ async function registerDevice() {
         if (resp.ok) {
             const data = await resp.json();
             logConsole(`Device registered on server. ID: ${data.id}`, "info");
-            updateDashboardStats();
+            window.updateDashboardStats?.();
         }
     } catch (e) {
         logConsole(`Device registration failed: ${e.message}`, "error");
@@ -195,7 +195,7 @@ async function fetchUserLocations() {
         });
         if (resp.ok) {
             userLocations = await resp.json();
-            updateDashboardStats();
+            window.updateDashboardStats?.();
         }
     } catch (e) {
         logConsole(`Failed to load locations: ${e.message}`, "error");
@@ -560,7 +560,7 @@ function connectSSE() {
         logConsole("SSE connected. Real-time push listener active.", "info");
         document.getElementById("backend-status").className = "connection-status badge-active";
         document.getElementById("backend-status").innerText = "Backend: Connected";
-        updateDashboardStats();
+        window.updateDashboardStats?.();
     };
 
     sseConnection.onerror = (e) => {
