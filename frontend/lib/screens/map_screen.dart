@@ -129,7 +129,7 @@ class MapScreen extends StatelessWidget {
             ),
             children: [
               TileLayer(
-                urlTemplate: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                urlTemplate: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
                 subdomains: const ['a', 'b', 'c', 'd'],
               ),
               CircleLayer(circles: circles),
@@ -143,7 +143,7 @@ class MapScreen extends StatelessWidget {
             left: 16,
             right: 16,
             child: Card(
-              color: const Color(0xFF111318).withOpacity(0.9),
+              color: Colors.white.withOpacity(0.94),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Row(
@@ -173,7 +173,7 @@ class MapScreen extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: Colors.white70),
+          style: const TextStyle(fontSize: 11, color: Color(0xFF3C3C43)),
         ),
       ],
     );

@@ -20,14 +20,14 @@ class EarthquakeAlertApp extends StatelessWidget {
     return MaterialApp(
       title: 'Earthquake Alert Indonesia',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF0D0E12),
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF1890FF),
-          secondary: Color(0xFF52C41A),
-          error: Color(0xFFFF4D4F),
-          surface: Color(0xFF111318),
-          background: Color(0xFF0A0B0D),
+      theme: ThemeData.light().copyWith(
+        scaffoldBackgroundColor: const Color(0xFFF2F2F7),
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF007AFF),
+          secondary: Color(0xFF34C759),
+          error: Color(0xFFFF3B30),
+          surface: Colors.white,
+          background: Color(0xFFF2F2F7),
         ),
         textTheme: const TextTheme(
           titleLarge: TextStyle(fontFamily: 'Outfit', fontWeight: FontWeight.bold),
@@ -35,10 +35,10 @@ class EarthquakeAlertApp extends StatelessWidget {
           bodyMedium: TextStyle(fontFamily: 'Outfit'),
         ),
         cardTheme: CardTheme(
-          color: const Color(0xFF111318),
+          color: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Colors.white12, width: 1),
+            borderRadius: BorderRadius.circular(14),
+            side: const BorderSide(color: Color(0x2E3C3C43), width: 1),
           ),
         ),
       ),
@@ -138,25 +138,25 @@ class _MainTabContainerState extends State<MainTabContainer> {
   void _showNotificationBanner(String title, String body) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: const Color(0xFF111318),
+        backgroundColor: Colors.white,
         duration: const Duration(seconds: 7),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: Color(0xFFFF4D4F), width: 1),
         ),
-        content: Row(
+                  content: Row(
           children: [
-            const Text('🚨', style: TextStyle(fontSize: 24)),
+            const Icon(Icons.warning_rounded, color: Color(0xFFFF3B30), size: 24),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E))),
                   const SizedBox(height: 2),
-                  Text(body, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                  Text(body, style: const TextStyle(color: Color(0xFF6E6E73), fontSize: 12)),
                 ],
               ),
             ),
@@ -235,9 +235,9 @@ class _MainTabContainerState extends State<MainTabContainer> {
             _currentIndex = index;
           });
         },
-        backgroundColor: const Color(0xFF111318),
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white38,
+        backgroundColor: Colors.white,
+        selectedItemColor: const Color(0xFF007AFF),
+        unselectedItemColor: const Color(0xFF8E8E93),
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
         items: const [

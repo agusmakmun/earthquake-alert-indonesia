@@ -79,10 +79,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (list == null || list.isEmpty) {
       return Card(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: Colors.white12),
+          side: const BorderSide(color: Color(0x2E3C3C43)),
         ),
         child: Container(
           width: double.infinity,
@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: const Text(
             'Belum ada data riwayat gempa.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white30, fontSize: 13),
+            style: TextStyle(color: Color(0xFF8E8E93), fontSize: 13),
           ),
         ),
       );
@@ -118,10 +118,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
         return Card(
           margin: const EdgeInsets.only(bottom: 8),
-          color: Colors.white.withOpacity(0.02),
+          color: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: Colors.white10),
+            side: const BorderSide(color: Color(0x2E3C3C43)),
           ),
           child: ListTile(
             onTap: () {
@@ -149,18 +149,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 2),
                 Text(
                   subText,
-                  style: const TextStyle(fontSize: 12, color: Colors.white70),
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF6E6E73)),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   formattedTime,
-                  style: const TextStyle(fontSize: 10, color: Colors.white30),
+                  style: const TextStyle(fontSize: 10, color: Color(0xFF8E8E93)),
                 ),
               ],
             ),
-            trailing: const Icon(Icons.chevron_right, color: Colors.white24),
+            trailing: const Icon(Icons.chevron_right, color: Color(0xFF8E8E93)),
           ),
         );
       },
@@ -237,12 +237,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.isOffline ? '🔴 Offline Mode' : '🟢 Alert Active',
+                              widget.isOffline ? 'Offline Mode' : 'Alert Active',
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                             ),
                             Text(
                               widget.isOffline ? 'Gempabumi tidak dapat dimuat.' : 'Memantau data resmi BMKG',
-                              style: const TextStyle(color: Colors.white70, fontSize: 13),
+                              style: const TextStyle(color: Color(0xFF6E6E73), fontSize: 13),
                             ),
                           ],
                         ),
@@ -256,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // Locations Pantauan
               const Text(
                 'LOKASI PANTAUAN',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white54, letterSpacing: 1),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF6E6E73), letterSpacing: 1),
               ),
               const SizedBox(height: 8),
               if (widget.locations.isEmpty)
@@ -267,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: const Text(
                       'Belum ada lokasi pantauan. Buka Settings untuk menambahkan.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white54),
+                      style: TextStyle(color: Color(0xFF6E6E73)),
                     ),
                   ),
                 )
@@ -282,13 +282,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       margin: const EdgeInsets.only(bottom: 8),
                       child: ListTile(
                         title: Text(loc['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text(loc['type'] == 'current_location' ? '📍 GPS Koordinat' : '🗺️ Wilayah Manual'),
+                        subtitle: Text(loc['type'] == 'current_location' ? 'GPS Koordinat' : 'Wilayah Manual'),
                         trailing: Container(
                           width: 8,
                           height: 8,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: loc['enabled'] == true ? const Color(0xFF52C41A) : Colors.white24,
+                            color: loc['enabled'] == true ? const Color(0xFF34C759) : const Color(0xFF8E8E93),
                           ),
                         ),
                       ),
@@ -300,7 +300,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // Relevant earthquake
               const Text(
                 'GEMPA RELEVAN TERBARU',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white54, letterSpacing: 1),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF6E6E73), letterSpacing: 1),
               ),
               const SizedBox(height: 8),
               if (relevantEq == null)
@@ -310,11 +310,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(32),
                     child: Column(
                       children: const [
-                        Text('🌋', style: TextStyle(fontSize: 32)),
+                        Icon(Icons.show_chart_rounded, color: Color(0xFF8E8E93), size: 34),
                         SizedBox(height: 8),
                         Text(
                           'Tidak ada gempa relevan terbaru.',
-                          style: TextStyle(color: Colors.white54),
+                          style: TextStyle(color: Color(0xFF6E6E73)),
                         ),
                       ],
                     ),
@@ -339,7 +339,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             Expanded(
                               child: Text(
-                                '${isCritical ? '🚨 ' : '🌋 '}${relevantEq['region']}',
+                                '${relevantEq['region']}',
                                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                               ),
                             ),
@@ -359,27 +359,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 8),
                         Text(
                           relevantEq['location_description'] ?? '',
-                          style: const TextStyle(color: Colors.white70),
+                          style: const TextStyle(color: Color(0xFF6E6E73)),
                         ),
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            Icon(Icons.waves, size: 14, color: Colors.white38),
+                            Icon(Icons.waves, size: 14, color: Color(0xFF8E8E93)),
                             const SizedBox(width: 4),
-                            Text('Dalaman: ${relevantEq['depth_km']} Km', style: const TextStyle(fontSize: 12, color: Colors.white38)),
+                            Text('Dalaman: ${relevantEq['depth_km']} Km', style: const TextStyle(fontSize: 12, color: Color(0xFF8E8E93))),
                             const SizedBox(width: 16),
-                            Icon(Icons.access_time, size: 14, color: Colors.white38),
+                            Icon(Icons.access_time, size: 14, color: Color(0xFF8E8E93)),
                             const SizedBox(width: 4),
                             Text(
                               'Jam: ${DateTime.parse(relevantEq['event_time']).toLocal().toString().split(' ')[1].substring(0, 5)}',
-                              style: const TextStyle(fontSize: 12, color: Colors.white38),
+                              style: const TextStyle(fontSize: 12, color: Color(0xFF8E8E93)),
                             ),
                           ],
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white12,
+                            backgroundColor: const Color(0x14007AFF),
                             elevation: 0,
                             minimumSize: const Size(double.infinity, 44),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -392,7 +392,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             );
                           },
-                          child: const Text('Lihat Detail', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          child: const Text('Lihat Detail', style: TextStyle(color: Color(0xFF007AFF), fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
@@ -403,12 +403,12 @@ class _HomeScreenState extends State<HomeScreen> {
               // Riwayat Gempa Bumi
               const Text(
                 'RIWAYAT GEMPA BUMI',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white54, letterSpacing: 1),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF6E6E73), letterSpacing: 1),
               ),
               const SizedBox(height: 8),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.04),
+                  color: const Color(0x14767680),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 padding: const EdgeInsets.all(3),
@@ -424,13 +424,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
-                            color: _activeHistoryTab == 'felt' ? Colors.white.withOpacity(0.08) : Colors.transparent,
+                            color: _activeHistoryTab == 'felt' ? Colors.white : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
                             'Dirasakan',
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1C1C1E)),
                           ),
                         ),
                       ),
@@ -445,13 +445,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
-                            color: _activeHistoryTab == 'm5' ? Colors.white.withOpacity(0.08) : Colors.transparent,
+                            color: _activeHistoryTab == 'm5' ? Colors.white : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
                             'M 5.0+',
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1C1C1E)),
                           ),
                         ),
                       ),

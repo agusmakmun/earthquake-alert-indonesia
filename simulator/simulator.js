@@ -5,6 +5,23 @@ const simulatorApiUrl = new URL(window.location.origin);
 const simulatorIsLocalHost = ["localhost", "127.0.0.1", "::1"].includes(simulatorApiUrl.hostname);
 const API_BASE = simulatorIsLocalHost ? "http://127.0.0.1:8787" : simulatorApiUrl.origin;
 const RELEVANT_EARTHQUAKE_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
+
+function iconSvg(name, className = "ui-icon") {
+    const paths = {
+        activity: '<path d="M3 12h4l2-7 4 14 2-7h6"/>',
+        alert: '<path d="m10.3 2.9-8 14A2 2 0 0 0 4 20h16a2 2 0 0 0 1.7-3.1l-8-14a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/>',
+        pin: '<path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
+        map: '<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15M15 6v15"/>',
+        settings: '<path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="m19.4 15 .1.1a2 2 0 1 1-2.8 2.8l-.1-.1a2 2 0 0 0-3.4 1.4v.3a2 2 0 1 1-4 0v-.2A2 2 0 0 0 5.8 18l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A2 2 0 0 0 1.6 12a2 2 0 1 1 0-4h.2A2 2 0 0 0 3 4.6l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A2 2 0 0 0 9.2.4V.2a2 2 0 1 1 4 0v.2a2 2 0 0 0 3.4 1.4l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A2 2 0 0 0 20.8 8h.2a2 2 0 1 1 0 4h-.2a2 2 0 0 0-1.4 3Z"/>',
+        trash: '<path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M10 11v6M14 11v6"/>',
+        chevron: '<path d="m9 18 6-6-6-6"/>',
+        home: '<path d="m3 10 9-7 9 7v10H3V10Z"/><path d="M9 20v-6h6v6"/>',
+        wifi: '<path d="M2 8.8a15.5 15.5 0 0 1 20 0M5 12.5a10.8 10.8 0 0 1 14 0M8.5 16a5.8 5.8 0 0 1 7 0M12 20h.01"/>',
+        battery: '<rect x="2" y="6" width="18" height="12" rx="2"/><path d="M22 10v4M5 9v6h9V9H5Z"/>',
+    };
+    return `<svg class="${className}" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths[name] || paths.activity}</svg>`;
+}
+window.iconSvg = iconSvg;
 let installationId = localStorage.getItem("installation_id");
 let isNotificationsEnabled = true;
 let activeView = "home";
@@ -239,7 +256,7 @@ function renderHomeView() {
             pill.innerHTML = `
                 <div class="location-pill-info">
                     <h4>${loc.name}</h4>
-                    <span>${loc.type === "current_location" ? "📍 GPS Koordinat" : "🗺️ Wilayah Manual"}</span>
+                    <span>${loc.type === "current_location" ? `${iconSvg("pin")} GPS Koordinat` : `${iconSvg("map")} Wilayah Manual`}</span>
                 </div>
                 <div class="location-status-dot ${loc.enabled ? '' : 'disabled'}"></div>
             `;
@@ -270,7 +287,7 @@ function renderHomeView() {
         relevantContainer.className = `card eq-alert-card ${isCritical ? 'critical' : ''}`;
         relevantContainer.innerHTML = `
             <div class="eq-badge">M ${relevantEq.magnitude.toFixed(1)}</div>
-            <h3>${isCritical ? '🚨 ' : '🌋 '}${relevantEq.region}</h3>
+            <h3>${iconSvg(isCritical ? "alert" : "activity")} ${relevantEq.region}</h3>
             <p>${relevantEq.location_description}</p>
             <div class="eq-meta">
                 <span>Dalaman: <strong>${relevantEq.depth_km} km</strong></span>
@@ -283,7 +300,7 @@ function renderHomeView() {
     } else {
         relevantContainer.className = "card empty-card";
         relevantContainer.innerHTML = `
-            <div class="empty-icon">🌋</div>
+            <div class="empty-icon">${iconSvg("activity", "empty-svg")}</div>
             <p>Tidak ada gempa signifikan/relevan terbaru dengan lokasi pantauan Anda.</p>
         `;
     }
@@ -348,7 +365,7 @@ function renderHistoryList() {
                 <p>${subText}</p>
                 <p style="font-size: 0.6rem; color: rgba(255,255,255,0.4); margin-top: 2px;">${formattedTime}</p>
             </div>
-            <div class="history-chevron">❯</div>
+            <div class="history-chevron">${iconSvg("chevron")}</div>
         `;
         item.addEventListener("click", () => {
             renderDetailView(eq);
@@ -370,8 +387,8 @@ function renderSettingsView() {
                 <span>${loc.latitude.toFixed(3)}, ${loc.longitude.toFixed(3)}</span>
             </div>
             <div class="setting-loc-actions">
-                <button class="btn-icon toggle-loc" data-id="${loc.id}">${loc.enabled ? '🟢' : '⚪'}</button>
-                <button class="btn-icon delete-loc" data-id="${loc.id}">🗑️</button>
+                <button class="btn-icon toggle-loc" data-id="${loc.id}" aria-label="${loc.enabled ? 'Disable' : 'Enable'} location">${iconSvg(loc.enabled ? "activity" : "activity")}</button>
+                <button class="btn-icon delete-loc" data-id="${loc.id}" aria-label="Delete location">${iconSvg("trash")}</button>
             </div>
         `;
         list.appendChild(item);
@@ -609,7 +626,7 @@ function triggerNotificationBanner(payload) {
     const eq = payload.earthquake;
     const isCritical = payload.severity === "CRITICAL";
     
-    title.innerText = `${isCritical ? '🚨 POTENSI TSUNAMI' : '🌋 Gempa Dirasakan'} M ${eq.magnitude.toFixed(1)}`;
+    title.innerHTML = `${iconSvg(isCritical ? "alert" : "activity")} ${isCritical ? 'POTENSI TSUNAMI' : 'Gempa Dirasakan'} M ${eq.magnitude.toFixed(1)}`;
     text.innerText = `${eq.region}. Dirasakan di ${payload.location_name}.`;
     
     banner.className = `push-banner active ${isCritical ? 'critical' : ''}`;
@@ -805,7 +822,7 @@ async function deleteLocation(locId) {
 
 // Offline UI handlers
 function setOfflineState() {
-    document.getElementById("app-state-title").innerText = "🔴 Offline Mode";
+    document.getElementById("app-state-title").innerHTML = '<span class="status-dot-icon inactive"></span>Offline Mode';
     document.getElementById("app-state-desc").innerText = lastSuccessfulUpdate ? `Update terakhir: ${lastSuccessfulUpdate}` : "Gagal memuat data BMKG";
     document.querySelector(".monitoring-status-card").style.borderColor = "var(--accent-red)";
     document.querySelector(".monitoring-status-card").style.background = "linear-gradient(135deg, rgba(255, 77, 79, 0.08) 0%, rgba(255, 77, 79, 0.02) 100%)";
@@ -814,7 +831,7 @@ function setOfflineState() {
 }
 
 function clearOfflineState() {
-    document.getElementById("app-state-title").innerText = "🟢 Alert Active";
+    document.getElementById("app-state-title").innerHTML = '<span class="status-dot-icon active"></span>Alert Active';
     document.getElementById("app-state-desc").innerText = "Memantau data resmi BMKG";
     document.querySelector(".monitoring-status-card").style.borderColor = "rgba(82, 196, 26, 0.15)";
     document.querySelector(".monitoring-status-card").style.background = "linear-gradient(135deg, rgba(82, 196, 26, 0.08) 0%, rgba(82, 196, 26, 0.02) 100%)";
