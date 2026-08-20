@@ -15,13 +15,14 @@ app.use("*", cors({ origin: "*" }));
 
 // In-memory cache for connected SSE clients (stored in Durable Objects or broadcast via queue)
 const sseClients = new Set();
+const sseEncoder = new TextEncoder();
 
 function broadcastAlerts(alerts) {
   for (const clientId of sseClients) {
     if (typeof globalThis !== "undefined" && globalThis.__sseControllers?.[clientId]) {
       const controller = globalThis.__sseControllers[clientId];
       for (const alert of alerts) {
-        controller.enqueue(`event: push_notification\ndata: ${JSON.stringify(alert)}\n\n`);
+        controller.enqueue(sseEncoder.encode(`event: push_notification\ndata: ${JSON.stringify(alert)}\n\n`));
       }
     }
   }
@@ -224,10 +225,10 @@ app.get("/api/v1/stream", async (c) => {
       console.log(`SSE client connected: ${clientId}. Total: ${sseClients.size}`);
       
       // Send initial connection message
-      controller.enqueue(`:connected\n\n`);
+      controller.enqueue(sseEncoder.encode(":connected\n\n"));
       
       // Store controller in a way we can access it later
-      if (typeof globalThis !== "undefined" && globalThis.__sseControllers) {
+      if (typeof globalThis !== "undefined") {
         globalThis.__sseControllers = globalThis.__sseControllers || {};
         globalThis.__sseControllers[clientId] = controller;
       }

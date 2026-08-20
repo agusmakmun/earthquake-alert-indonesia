@@ -1,6 +1,10 @@
 // admin.js
 // Logic for the developer control panel to trigger simulated earthquakes.
 
+const API_BASE = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"
+    ? "http://127.0.0.1:8787"
+    : window.location.origin;
+
 const PRESETS = {
     sunda_felt: {
         magnitude: 5.2,
@@ -91,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.logConsole(`Triggering mock earthquake: M ${payload.magnitude} in ${payload.region}...`, "warn");
 
         try {
-            const resp = await fetch(`${window.location.origin}/api/v1/mock/trigger`, {
+            const resp = await fetch(`${API_BASE}/api/v1/mock/trigger`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -133,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Update Developer Dashboard Stats Counter
 async function updateDashboardStats() {
     try {
-        const resp = await fetch(`${window.location.origin}/api/v1/admin/stats`);
+        const resp = await fetch(`${API_BASE}/api/v1/admin/stats`);
         if (resp.ok) {
             const data = await resp.json();
             document.getElementById("stat-sse-clients").innerText = data.sse_clients;
