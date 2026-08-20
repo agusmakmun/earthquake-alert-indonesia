@@ -34,13 +34,13 @@ class DetailScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: Colors.white,
+                color: const Color(0xFF111318),
                 gradient: const LinearGradient(
-                  colors: [Colors.white, Color(0xFFF8F8FA)],
+                  colors: [Color(0xFF181920), Color(0xFF111218)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                border: Border.all(color: Color(0x2E3C3C43)),
+                border: Border.all(color: Colors.white12),
               ),
               child: Column(
                 children: [
@@ -73,7 +73,7 @@ class DetailScreen extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     DateTime.parse(earthquake['event_time']).toLocal().toString().substring(0, 16),
-                    style: const TextStyle(color: Color(0xFF6E6E73), fontSize: 13),
+                    style: const TextStyle(color: Colors.white54, fontSize: 13),
                   ),
                 ],
               ),
@@ -101,7 +101,7 @@ class DetailScreen extends StatelessWidget {
             if (feltAreas.isNotEmpty && feltAreas[0].toString().trim().isNotEmpty) ...[
               const Text(
                 'WILAYAH DIRASAKAN (MMI)',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF6E6E73), letterSpacing: 1),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white54, letterSpacing: 1),
               ),
               const SizedBox(height: 8),
               Wrap(
@@ -109,8 +109,8 @@ class DetailScreen extends StatelessWidget {
                 runSpacing: 8,
                 children: feltAreas.map((area) {
                   return Chip(
-                    backgroundColor: Color(0x14767680),
-                    label: Text(area.trim(), style: const TextStyle(fontSize: 12, color: Color(0xFF3C3C43))),
+                    backgroundColor: Colors.white12,
+                    label: Text(area.trim(), style: const TextStyle(fontSize: 12, color: Colors.white70)),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     side: BorderSide.none,
                   );
@@ -123,7 +123,7 @@ class DetailScreen extends StatelessWidget {
             if (earthquake['shakemap_url'] != null) ...[
               const Text(
                 'PETA GUNCANGAN (SHAKEMAP)',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF6E6E73), letterSpacing: 1),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white54, letterSpacing: 1),
               ),
               const SizedBox(height: 8),
               ClipRRect(
@@ -137,11 +137,11 @@ class DetailScreen extends StatelessWidget {
                     return Container(
                       width: double.infinity,
                       height: 150,
-                      color: const Color(0xFFF2F2F7),
+                      color: const Color(0xFF111318),
                       alignment: Alignment.center,
                       child: const Text(
                         'Peta guncangan tidak tersedia.',
-                        style: TextStyle(color: Color(0xFF8E8E93)),
+                        style: TextStyle(color: Colors.white30),
                       ),
                     );
                   },
@@ -155,7 +155,7 @@ class DetailScreen extends StatelessWidget {
               child: Text(
                 'Sumber data resmi diperoleh dari Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) Indonesia Terbuka.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 10, color: Color(0xFF8E8E93)),
+                style: TextStyle(fontSize: 10, color: Colors.white38),
               ),
             ),
           ],
@@ -168,9 +168,9 @@ class DetailScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF111318),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Color(0x2E3C3C43)),
+        border: Border.all(color: Colors.white12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,7 +178,7 @@ class DetailScreen extends StatelessWidget {
         children: [
           Text(
             label.toUpperCase(),
-            style: const TextStyle(fontSize: 10, color: Color(0xFF6E6E73), fontWeight: FontWeight.bold, letterSpacing: 0.5),
+            style: const TextStyle(fontSize: 10, color: Colors.white38, fontWeight: FontWeight.bold, letterSpacing: 0.5),
           ),
           const SizedBox(height: 2),
           Text(

@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: const Text(
             'Belum ada data riwayat gempa.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Color(0xFF8E8E93), fontSize: 13),
+            style: TextStyle(color: Colors.white30, fontSize: 13),
           ),
         ),
       );
@@ -149,18 +149,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 2),
                 Text(
                   subText,
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF6E6E73)),
+                  style: const TextStyle(fontSize: 12, color: Colors.white70),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   formattedTime,
-                  style: const TextStyle(fontSize: 10, color: Color(0xFF8E8E93)),
+                  style: const TextStyle(fontSize: 10, color: Colors.white30),
                 ),
               ],
             ),
-            trailing: const Icon(Icons.chevron_right, color: Color(0xFF8E8E93)),
+            trailing: const Icon(Icons.chevron_right, color: Colors.white24),
           ),
         );
       },
@@ -359,27 +359,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 8),
                         Text(
                           relevantEq['location_description'] ?? '',
-                          style: const TextStyle(color: Color(0xFF6E6E73)),
+                          style: const TextStyle(color: Colors.white70),
                         ),
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            Icon(Icons.waves, size: 14, color: Color(0xFF8E8E93)),
+                            Icon(Icons.waves, size: 14, color: Colors.white38),
                             const SizedBox(width: 4),
-                            Text('Dalaman: ${relevantEq['depth_km']} Km', style: const TextStyle(fontSize: 12, color: Color(0xFF8E8E93))),
+                            Text('Dalaman: ${relevantEq['depth_km']} Km', style: const TextStyle(fontSize: 12, color: Colors.white38)),
                             const SizedBox(width: 16),
-                            Icon(Icons.access_time, size: 14, color: Color(0xFF8E8E93)),
+                            Icon(Icons.access_time, size: 14, color: Colors.white38),
                             const SizedBox(width: 4),
                             Text(
                               'Jam: ${DateTime.parse(relevantEq['event_time']).toLocal().toString().split(' ')[1].substring(0, 5)}',
-                              style: const TextStyle(fontSize: 12, color: Color(0xFF8E8E93)),
+                              style: const TextStyle(fontSize: 12, color: Colors.white38),
                             ),
                           ],
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0x14007AFF),
+                            backgroundColor: Colors.white12,
                             elevation: 0,
                             minimumSize: const Size(double.infinity, 44),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -392,7 +392,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             );
                           },
-                          child: const Text('Lihat Detail', style: TextStyle(color: Color(0xFF007AFF), fontWeight: FontWeight.bold)),
+                          child: const Text('Lihat Detail', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
@@ -408,7 +408,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 8),
               Container(
                 decoration: BoxDecoration(
-                  color: const Color(0x14767680),
+                  color: Colors.white.withOpacity(0.04),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 padding: const EdgeInsets.all(3),
@@ -424,13 +424,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
-                            color: _activeHistoryTab == 'felt' ? Colors.white : Colors.transparent,
+                            color: _activeHistoryTab == 'felt' ? Colors.white.withOpacity(0.08) : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
                             'Dirasakan',
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1C1C1E)),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
                           ),
                         ),
                       ),
@@ -445,13 +445,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
-                            color: _activeHistoryTab == 'm5' ? Colors.white : Colors.transparent,
+                            color: _activeHistoryTab == 'm5' ? Colors.white.withOpacity(0.08) : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
                             'M 5.0+',
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1C1C1E)),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
                           ),
                         ),
                       ),

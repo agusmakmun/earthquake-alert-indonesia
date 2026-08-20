@@ -124,7 +124,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF111318),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -140,12 +140,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 20),
               ListTile(
-                leading: const Icon(Icons.gps_fixed, color: Color(0xFF007AFF)),
+                leading: const Icon(Icons.gps_fixed, color: Color(0xFF1890FF)),
                 title: const Text('Gunakan Lokasi GPS Saat Ini'),
                 subtitle: const Text('Akan merecord koordinat GPS Anda secara instant.'),
                 onTap: _addGPSLocation,
               ),
-              const Divider(color: Color(0x2E3C3C43)),
+              const Divider(color: Colors.white12),
               ListTile(
                 leading: const Icon(Icons.map, color: Color(0xFFFA8C16)),
                 title: const Text('Pilih Wilayah Secara Manual'),
@@ -174,7 +174,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              backgroundColor: Colors.white,
+              backgroundColor: const Color(0xFF111318),
               title: const Text('Pilih Lokasi Manual'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -183,7 +183,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     isExpanded: true,
                     value: selectedProvince,
                     hint: const Text('Pilih Provinsi'),
-                    dropdownColor: Colors.white,
+                    dropdownColor: const Color(0xFF111318),
                     items: _provinces.map((prov) {
                       return DropdownMenuItem<dynamic>(
                         value: prov,
@@ -204,7 +204,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: selectedCity,
                     hint: const Text('Pilih Kota / Kabupaten (opsional)'),
                     disabledHint: const Text('Pilih Provinsi Terlebih Dahulu'),
-                    dropdownColor: Colors.white,
+                    dropdownColor: const Color(0xFF111318),
                     items: filteredCities.map((city) {
                       return DropdownMenuItem<dynamic>(
                         value: city,
@@ -225,7 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     controller: nameController,
                     decoration: const InputDecoration(
                       labelText: 'Label Lokasi (e.g. Rumah, Kantor)',
-                      labelStyle: TextStyle(color: Color(0xFF6E6E73)),
+                      labelStyle: TextStyle(color: Colors.white54),
                     ),
                   ),
                 ],
@@ -233,7 +233,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Batal', style: TextStyle(color: Color(0xFF6E6E73))),
+                  child: const Text('Batal', style: TextStyle(color: Colors.white54)),
                 ),
                 ElevatedButton(
                   onPressed: selectedProvince == null
@@ -269,7 +269,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: const Color(0xFF111318),
           title: const Text('Official Disclaimer'),
           content: SingleChildScrollView(
             child: Column(
@@ -281,7 +281,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 Text(
                   'Aplikasi ini tidak memprediksi gempa bumi sebelum terjadi. Notifikasi dikirim sesaat setelah data kejadian tersedia pada sistem BMKG.',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF3C3C43)),
+                  style: TextStyle(fontSize: 12, color: Colors.white70),
                 ),
                 SizedBox(height: 8),
                 Text(
@@ -290,7 +290,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 Text(
                   'Seluruh data kebencanaan gempa bumi diperoleh langsung dari API Data Terbuka BMKG.',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF3C3C43)),
+                  style: TextStyle(fontSize: 12, color: Colors.white70),
                 ),
                 SizedBox(height: 8),
                 Text(
@@ -299,7 +299,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 Text(
                   'Utamakan petunjuk keselamatan resmi dari otoritas penanganan bencana setempat (BMKG, BNPB) saat terjadi bencana sesungguhnya.',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF3C3C43)),
+                  style: TextStyle(fontSize: 12, color: Colors.white70),
                 ),
               ],
             ),
@@ -307,7 +307,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Saya Mengerti', style: TextStyle(color: Color(0xFF007AFF))),
+              child: const Text('Saya Mengerti', style: TextStyle(color: Color(0xFF1890FF))),
             ),
           ],
         );
@@ -336,7 +336,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: const Text('Kirim alert untuk guncangan yang relevan'),
                 value: _notificationsEnabled,
                 onChanged: _toggleNotification,
-                activeColor: const Color(0xFF34C759),
+                activeColor: const Color(0xFF52C41A),
               ),
             ),
             const SizedBox(height: 20),
@@ -347,12 +347,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 const Text(
                   'LOKASI PANTALUAN (MAKS 5)',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF6E6E73)),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white54),
                 ),
                 if (!_isLoadingRegions)
                   TextButton(
                     onPressed: _showAddLocationDialog,
-                    child: const Text('+ Tambah', style: TextStyle(color: Color(0xFF007AFF))),
+                    child: const Text('+ Tambah', style: TextStyle(color: Color(0xFF1890FF))),
                   )
                 else
                   const SizedBox(
@@ -373,7 +373,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: const Text(
                     'Belum ada lokasi pantauan.',
                     textAlign: Center,
-                    style: TextStyle(color: Color(0xFF6E6E73)),
+                    style: TextStyle(color: Colors.white54),
                   ),
                 ),
               )
@@ -392,7 +392,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       leading: IconButton(
                         icon: Icon(
                           loc['enabled'] == true ? Icons.check_circle : Icons.radio_button_unchecked,
-                          color: loc['enabled'] == true ? const Color(0xFF34C759) : const Color(0xFF8E8E93),
+                          color: loc['enabled'] == true ? const Color(0xFF52C41A) : Colors.white24,
                         ),
                         onPressed: () => _toggleLocation(loc['id'], loc['enabled'] != true),
                       ),
@@ -418,7 +418,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: const [
-                        Text('Sumber Data', style: TextStyle(color: Color(0xFF6E6E73), fontSize: 13)),
+                        Text('Sumber Data', style: TextStyle(color: Colors.white54, fontSize: 13)),
                         Text('BMKG Terbuka', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                       ],
                     ),
@@ -426,7 +426,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: const [
-                        Text('Versi Aplikasi', style: TextStyle(color: Color(0xFF6E6E73), fontSize: 13)),
+                        Text('Versi Aplikasi', style: TextStyle(color: Colors.white54, fontSize: 13)),
                         Text('v1.0.0 (MVP)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                       ],
                     ),
@@ -437,7 +437,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                       onPressed: _showDisclaimerDialog,
-                      child: const Text('Disclaimer Resmi', style: TextStyle(color: Color(0xFF3C3C43))),
+                      child: const Text('Disclaimer Resmi', style: TextStyle(color: Colors.white70)),
                     ),
                   ],
                 ),

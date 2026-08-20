@@ -1569,6 +1569,73 @@ select option {
     stroke-width: 2;
 }
 
+/* Keep the simulated app in dark mode while retaining the iOS layout and SVG icons. */
+.iphone-screen {
+    --ios-bg: #0d0e12;
+    --ios-surface: rgba(255, 255, 255, 0.03);
+    --ios-solid-surface: #111318;
+    --ios-text: #f3f4f6;
+    --ios-secondary: #9ca3af;
+    --ios-tertiary: #6b7280;
+    --ios-separator: rgba(255, 255, 255, 0.08);
+    --ios-blue: #1890ff;
+    --ios-green: #52c41a;
+    --ios-orange: #fa8c16;
+    --ios-red: #ff4d4f;
+    background: var(--ios-bg);
+    color: var(--ios-text);
+}
+
+.iphone-screen .status-bar,
+.iphone-screen .app-nav {
+    background: rgba(17, 19, 24, 0.88);
+    color: var(--ios-text);
+}
+
+.iphone-screen .card,
+.iphone-screen .location-pill,
+.iphone-screen .detail-item-box,
+.iphone-screen .felt-list-box,
+.iphone-screen .history-item {
+    background: var(--ios-surface);
+    border-color: var(--ios-separator);
+    box-shadow: none;
+}
+
+.iphone-screen .card:hover,
+.iphone-screen .history-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.iphone-screen .card h3,
+.iphone-screen .location-pill-info h4,
+.iphone-screen .detail-title,
+.iphone-screen .detail-item-box strong,
+.iphone-screen .history-info h4,
+.iphone-screen .eq-meta span strong {
+    color: var(--ios-text);
+}
+
+.iphone-screen .card p,
+.iphone-screen .location-pill-info span,
+.iphone-screen .detail-subtitle,
+.iphone-screen .detail-item-box span,
+.iphone-screen .eq-meta,
+.iphone-screen .history-info p,
+.iphone-screen .attribution-footer {
+    color: var(--ios-secondary);
+}
+
+.iphone-screen .history-tab-btn.active {
+    color: var(--ios-text);
+    background: var(--ios-solid-surface);
+}
+
+.iphone-screen .banner-content h4,
+.iphone-screen .banner-content p {
+    color: var(--ios-text);
+}
+
 @keyframes flashBadge {
     from {
         opacity: 1;
