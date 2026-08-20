@@ -16,6 +16,7 @@ app.use("*", cors({ origin: "*" }));
 // In-memory cache for connected SSE clients (stored in Durable Objects or broadcast via queue)
 const sseClients = new Set();
 const sseEncoder = new TextEncoder();
+globalThis.__sseControllers = globalThis.__sseControllers || {};
 
 function broadcastAlerts(alerts) {
   for (const clientId of sseClients) {
@@ -217,6 +218,7 @@ app.get("/api/v1/admin/stats", async (c) => {
 app.get("/api/v1/stream", async (c) => {
   const kv = c.env.DEVICES_KV;
   let clientId = Math.random().toString(36).substr(2, 9);
+  let heartbeat;
   
   // Create a ReadableStream that sends events
   const stream = new ReadableStream({
@@ -226,6 +228,10 @@ app.get("/api/v1/stream", async (c) => {
       
       // Send initial connection message
       controller.enqueue(sseEncoder.encode(":connected\n\n"));
+
+      heartbeat = setInterval(() => {
+        controller.enqueue(sseEncoder.encode(":keep-alive\n\n"));
+      }, 15000);
       
       // Store controller in a way we can access it later
       if (typeof globalThis !== "undefined") {
@@ -234,6 +240,7 @@ app.get("/api/v1/stream", async (c) => {
       }
     },
     cancel() {
+      clearInterval(heartbeat);
       sseClients.delete(clientId);
       console.log(`SSE client disconnected: ${clientId}. Total: ${sseClients.size}`);
       

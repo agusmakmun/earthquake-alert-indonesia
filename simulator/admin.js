@@ -1,9 +1,9 @@
 // admin.js
 // Logic for the developer control panel to trigger simulated earthquakes.
 
-const API_BASE = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"
-    ? "http://127.0.0.1:8787"
-    : window.location.origin;
+const apiUrl = new URL(window.location.origin);
+const isLocalHost = ["localhost", "127.0.0.1", "::1"].includes(apiUrl.hostname);
+const API_BASE = isLocalHost ? "http://127.0.0.1:8787" : apiUrl.origin;
 
 const PRESETS = {
     sunda_felt: {

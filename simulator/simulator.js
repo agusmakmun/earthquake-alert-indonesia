@@ -1,9 +1,9 @@
 // simulator.js
 // Client application logic running inside the simulated mobile device.
 
-const API_BASE = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"
-    ? "http://127.0.0.1:8787"
-    : window.location.origin;
+const apiUrl = new URL(window.location.origin);
+const isLocalHost = ["localhost", "127.0.0.1", "::1"].includes(apiUrl.hostname);
+const API_BASE = isLocalHost ? "http://127.0.0.1:8787" : apiUrl.origin;
 let installationId = localStorage.getItem("installation_id");
 let isNotificationsEnabled = true;
 let activeView = "home";
