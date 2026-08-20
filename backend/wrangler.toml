@@ -21,10 +21,13 @@ kv_namespaces = [
   { binding = "DEVICES_KV", id = "YOUR_KV_PREVIEW_ID", preview_id = "YOUR_KV_PREVIEW_ID" }
 ]
 
-# Cron trigger for BMKG polling (every minute)
+# Fallback Cron trigger for BMKG polling (every minute).
+# Prefer a stream bridge posting to /webhook/earthquake for low latency.
 # Format: minute hour day month day-of-week
 [[triggers.crons]]
 cron = "* * * * *"
+
+# Set with: wrangler secret put WEBHOOK_SECRET
 
 # Analytics Engine binding
 analytics_engine_datasets = ["earthquakes"]

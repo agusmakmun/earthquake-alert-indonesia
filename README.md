@@ -8,7 +8,8 @@ Earthquake Alert Indonesia is a real-time Earthquake Early Warning (EEW) applica
 
 The system uses a serverless, database-less architecture designed to run globally with zero maintenance:
 * **Cloudflare Workers**: Runs on Cloudflare's global edge network (Jakarta location for Indonesian users).
-* **Cron Triggers**: Periodically checks BMKG open JSON APIs (`autogempa`, `gempadirasakan`, `gempaterkini`) every 1 minute.
+* **Push Webhook**: Accepts events from an always-on EMSC/BMKG stream bridge at `/webhook/earthquake` for low-latency detection.
+* **Cron Fallback**: Checks BMKG open JSON APIs (`autogempa`, `gempadirasakan`, `gempaterkini`) every 1 minute when push ingestion is unavailable.
 * **Alert Engine**: Evaluates incoming events against user registered coordinates using a hybrid priority rule:
   1. **Felt-Area Text Matching**: Regex parses the felt description (e.g. `"III Jakarta"`) and matches user locations (e.g. `"Jakarta Pusat"`).
   2. **Haversine Proximity Check**: Fallback distance checks matching coordinates to magnitude-based radius limits.
@@ -21,7 +22,7 @@ The system uses a serverless, database-less architecture designed to run globall
 ## 2. Directory Structure
 
 ```text
-├── src/                       # Cloudflare Workers backend
+├── backend/                   # Cloudflare Workers backend
 │   ├── index.js               # Main handler (REST endpoints, SSE, Cron)
 │   ├── storage.js             # KV storage abstraction
 │   ├── alertEngine.js         # Proximity & felt area matching logic
@@ -40,11 +41,8 @@ The system uses a serverless, database-less architecture designed to run globall
 │   ├── style.css              # Glassmorphic bezels styling
 │   └── simulator.js           # EventSource stream connection
 │
-├── backend/                   # (Legacy) FastAPI reference (kept for reference only)
-│   └── ...                    # Superseded by Cloudflare Workers (src/)
-│
-├── wrangler.toml              # Cloudflare Workers configuration
-├── package.json               # Node.js dependencies
+├── backend/wrangler.toml      # Cloudflare Workers configuration
+├── backend/package.json       # Node.js dependencies
 └── CLOUDFLARE_MIGRATION.md    # Deployment & setup guide
 ```
 
@@ -65,6 +63,9 @@ The system uses a serverless, database-less architecture designed to run globall
 
 Quick start:
 ```bash
+# Work from the Worker directory
+cd backend
+
 # Install dependencies
 npm install
 
@@ -111,6 +112,10 @@ flutter run
 ---
 
 ## 4. Testing
+
+### Push Webhook
+
+Set the secret with `wrangler secret put WEBHOOK_SECRET`, then configure the stream bridge to POST events with `Authorization: Bearer <secret>`. The Worker deduplicates by event ID and immediately runs the alert engine.
 
 ### Mock Earthquake Endpoint (for testing)
 Trigger a mock earthquake to verify alert matching logic:

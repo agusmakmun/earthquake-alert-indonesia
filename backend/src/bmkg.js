@@ -32,7 +32,7 @@ function parseDepth(depthStr) {
 /**
  * Normalize raw BMKG JSON earthquake record
  */
-function normalizeEarthquakeData(rawGempa) {
+export function normalizeEarthquakeData(rawGempa) {
   const dateTimeStr = rawGempa.DateTime || "";
   const coordinatesStr = rawGempa.Coordinates || "";
   const [lat, lng] = parseCoordinates(coordinatesStr);

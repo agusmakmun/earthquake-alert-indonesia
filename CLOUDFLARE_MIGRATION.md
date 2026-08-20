@@ -2,22 +2,22 @@
 
 ## ✅ Migration Complete
 
-Your Earthquake Alert Indonesia backend has been successfully migrated from FastAPI (Python) to **Cloudflare Workers** (JavaScript). Here's what was created:
+The backend now runs entirely as **Cloudflare Workers** (JavaScript) in `backend/`. The legacy FastAPI backend has been removed.
 
 ---
 
 ## 📁 New Files Created
 
 ### Core Backend Files
-- **`src/index.js`** - Main Cloudflare Worker handler with all API endpoints
-- **`src/storage.js`** - KV storage layer (replaces `devices.json`)
-- **`src/alertEngine.js`** - Alert matching logic (haversine distance, felt area regex)
-- **`src/bmkg.js`** - BMKG API polling and earthquake data parsing
-- **`src/seedData.js`** - Indonesian provinces and cities data
+- **`backend/src/index.js`** - Main Worker handler, API endpoints, SSE, and webhook
+- **`backend/src/storage.js`** - KV storage layer
+- **`backend/src/alertEngine.js`** - Alert matching logic
+- **`backend/src/bmkg.js`** - BMKG polling and earthquake data parsing
+- **`backend/src/seedData.js`** - Indonesian provinces and cities data
 
 ### Configuration Files
-- **`wrangler.toml`** - Cloudflare Workers configuration (Cron triggers, KV bindings)
-- **`package.json`** - Node.js dependencies and scripts
+- **`backend/wrangler.toml`** - Cloudflare Workers configuration
+- **`backend/package.json`** - Node.js dependencies and scripts
 
 ### Updated Files
 - **`frontend/lib/services/api_service.dart`** - Updated to use Cloudflare endpoint instead of localhost
@@ -109,7 +109,8 @@ Python uvicorn server → devices.json (file storage) → SSE streaming
 
 ### New (Cloudflare Workers)
 ```
-Cloudflare Edge → KV Storage → Cron Triggers → Push Notifications
+EMSC/BMKG stream bridge → /webhook/earthquake → KV → alert engine → FCM/Web Push
+                                  └── 1-minute Cron fallback → BMKG JSON feeds
 ```
 
 ### Key Changes
@@ -117,7 +118,7 @@ Cloudflare Edge → KV Storage → Cron Triggers → Push Notifications
 | Component | Old (FastAPI) | New (Cloudflare) |
 |-----------|---|---|
 | **Storage** | `devices.json` (local file) | Cloudflare KV (globally distributed) |
-| **Polling** | Continuous `while True` loop (30 seconds) | Cron triggers (every 1 minute) |
+| **Detection** | Continuous `while True` loop (30 seconds) | Push webhook; 1-minute Cron fallback |
 | **Execution** | Always running server | Serverless (triggered on demand) |
 | **Latency** | Depends on server location | <20ms (edge locations) |
 | **Cost** | VPS/server fees | Free tier: 100,000 req/day |
@@ -152,6 +153,7 @@ All endpoints remain the same as the FastAPI backend:
 ### Testing
 - `POST /api/v1/mock/trigger` - Inject mock earthquake (for testing)
 - `GET /api/v1/stream` - SSE stream for push notifications
+- `POST /webhook/earthquake` - Authenticated push ingestion for stream bridges
 
 ---
 
@@ -178,7 +180,9 @@ wrangler kv:key list --namespace-id YOUR_KV_NAMESPACE_ID
 
 1. **SSE Implementation**: The current SSE implementation uses in-memory controllers. For production with multiple Worker instances, consider using Durable Objects or a message queue.
 
-2. **BMKG Polling**: Runs every 1 minute via Cron trigger (configurable in `wrangler.toml` with `* * * * *` cron syntax).
+2. **Push ingestion**: Configure an always-on bridge for `wss://www.seismicportal.eu/standing_order/websocket` or a BMKG stream, then POST normalized events to `/webhook/earthquake` with `Authorization: Bearer <WEBHOOK_SECRET>`. Set the secret with `wrangler secret put WEBHOOK_SECRET`.
+3. **BMKG fallback polling**: Runs every 1 minute via Cron trigger in `backend/wrangler.toml` when the bridge is unavailable.
+4. **Mobile delivery**: SSE remains useful for simulators and connected clients. Production mobile alerts still need an FCM/Web Push sender using the alert payload and registered device token.
 
 3. **Free Tier Limits**:
    - 100,000 requests/day

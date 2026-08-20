@@ -16,6 +16,41 @@ app.use("*", cors({ origin: "*" }));
 // In-memory cache for connected SSE clients (stored in Durable Objects or broadcast via queue)
 const sseClients = new Set();
 
+function broadcastAlerts(alerts) {
+  for (const clientId of sseClients) {
+    if (typeof globalThis !== "undefined" && globalThis.__sseControllers?.[clientId]) {
+      const controller = globalThis.__sseControllers[clientId];
+      for (const alert of alerts) {
+        controller.enqueue(`event: push_notification\ndata: ${JSON.stringify(alert)}\n\n`);
+      }
+    }
+  }
+}
+
+async function processIncomingEarthquake(earthquake, kv) {
+  const cache = await storage.getEarthquakeCache(kv);
+  const eventId = earthquake.bmkg_event_id;
+
+  if (cache.all[eventId]) {
+    return { duplicate: true, alerts: [] };
+  }
+
+  cache.all[eventId] = earthquake;
+  cache.latest = earthquake;
+  if (earthquake.dirasakan) {
+    cache.felt = [earthquake, ...cache.felt].slice(0, 15);
+  }
+  if (earthquake.magnitude >= 5) {
+    cache.m5 = [earthquake, ...cache.m5].slice(0, 15);
+  }
+  await storage.saveEarthquakeCache(kv, cache);
+
+  const devices = await storage.getAllDevices(kv);
+  const alerts = await alertEngine.runAlertEngine(earthquake, devices, kv);
+  broadcastAlerts(alerts);
+  return { duplicate: false, alerts };
+}
+
 // ============================================================================
 // 1. DEVICE ENDPOINTS
 // ============================================================================
@@ -216,6 +251,40 @@ app.get("/api/v1/stream", async (c) => {
 });
 
 // ============================================================================
+// 5.5. PUSH INGESTION WEBHOOK
+// ============================================================================
+
+app.post("/webhook/earthquake", async (c) => {
+  const expectedSecret = c.env.WEBHOOK_SECRET;
+  const authorization = c.req.header("Authorization");
+  if (!expectedSecret || authorization !== `Bearer ${expectedSecret}`) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  const payload = await c.req.json();
+  const sourceEvent = payload.earthquake || payload.event || payload;
+  const earthquake = sourceEvent.DateTime || sourceEvent.Coordinates
+    ? bmkg.normalizeEarthquakeData(sourceEvent)
+    : {
+        ...sourceEvent,
+        bmkg_event_id: sourceEvent.bmkg_event_id || sourceEvent.id,
+        event_time: sourceEvent.event_time || new Date().toISOString(),
+        created_at: new Date().toISOString(),
+      };
+
+  if (!earthquake.bmkg_event_id) {
+    return c.json({ error: "Earthquake event ID is required" }, 400);
+  }
+
+  const result = await processIncomingEarthquake(earthquake, c.env.DEVICES_KV);
+  return c.json({
+    status: result.duplicate ? "duplicate" : "accepted",
+    event_id: earthquake.bmkg_event_id,
+    alerts_triggered: result.alerts.length,
+  }, result.duplicate ? 200 : 202);
+});
+
+// ============================================================================
 // 6. MOCK EARTHQUAKE INJECTION (Developer Tool)
 // ============================================================================
 
@@ -258,15 +327,7 @@ app.post("/api/v1/mock/trigger", async (c) => {
   const devices = await storage.getAllDevices(kv);
   const alerts = await alertEngine.runAlertEngine(mockEq, devices, kv);
   
-  // Broadcast to SSE clients
-  for (const clientId of sseClients) {
-    if (typeof globalThis !== "undefined" && globalThis.__sseControllers?.[clientId]) {
-      const controller = globalThis.__sseControllers[clientId];
-      for (const alert of alerts) {
-        controller.enqueue(`event: push_notification\ndata: ${JSON.stringify(alert)}\n\n`);
-      }
-    }
-  }
+  broadcastAlerts(alerts);
   
   return c.json(
     {
@@ -305,15 +366,7 @@ export async function handleCron(event, env, ctx) {
     
     console.log(`Triggered ${alerts.length} alerts for earthquake ${earthquake.bmkg_event_id}`);
     
-    // Broadcast to SSE clients
-    for (const clientId of sseClients) {
-      if (typeof globalThis !== "undefined" && globalThis.__sseControllers?.[clientId]) {
-        const controller = globalThis.__sseControllers[clientId];
-        for (const alert of alerts) {
-          controller.enqueue(`event: push_notification\ndata: ${JSON.stringify(alert)}\n\n`);
-        }
-      }
-    }
+    broadcastAlerts(alerts);
   }
 }
 

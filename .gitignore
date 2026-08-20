@@ -29,6 +29,14 @@ ios/Pods/
 pubspec.lock
 *.fdb_latencies
 
+# Node.js / Cloudflare Workers
+node_modules/
+.wrangler/
+.dev.vars
+.env
+.env.*
+!.env.example
+
 # IDEs and Editors
 .vscode/
 .idea/
