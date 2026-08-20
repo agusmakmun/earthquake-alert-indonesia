@@ -61,6 +61,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const triggerBtn = document.getElementById("btn-trigger-mock");
     const clearLogsBtn = document.getElementById("btn-clear-logs");
 
+    if (!triggerBtn || !presetSelect || !clearLogsBtn) {
+        console.error("Simulator admin controls are missing from the page.");
+        return;
+    }
+
     // Handle Preset Changes
     presetSelect.addEventListener("change", () => {
         const val = presetSelect.value;
@@ -116,8 +121,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             } else {
-                const err = await resp.json();
-                window.logConsole(`Failed to trigger earthquake: ${JSON.stringify(err)}`, "error");
+                const err = await resp.text();
+                window.logConsole(`Failed to trigger earthquake (${resp.status}): ${err}`, "error");
             }
         } catch (e) {
             window.logConsole(`Network error triggering earthquake: ${e.message}`, "error");

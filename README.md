@@ -95,18 +95,50 @@ class ApiService {
 
 ### 3. Build & Run on Mobile
 
-**iOS Simulator:**
+The repository currently contains the Flutter source and `pubspec.yaml`, but platform folders are generated locally. From `frontend/`, create them before running the app:
+
 ```bash
 cd frontend
+flutter create .
 flutter pub get
-cd ios && pod install && cd ..
+```
+
+**iOS Simulator:**
+```bash
+open -a Simulator
+flutter devices
 flutter run
 ```
 
 **Physical iPhone:**
 1. Ensure iPhone and Mac are on the same Wi-Fi network.
-2. `flutter devices` → copy your iPhone's device ID
+2. Run `flutter devices` and copy your iPhone's device ID.
 3. `flutter run -d <YOUR_DEVICE_ID>`
+
+**Android Emulator:**
+```bash
+flutter emulators
+flutter emulators --launch <EMULATOR_ID>
+flutter run -d <DEVICE_ID>
+```
+
+**Chrome smoke test:**
+```bash
+flutter run -d chrome
+```
+
+If no supported mobile device is available, run the backend and Flutter app separately:
+
+```bash
+# Terminal 1, repository root
+pnpm dev:backend
+
+# Terminal 2
+cd frontend
+flutter run -d <DEVICE_ID>
+```
+
+`pnpm dev:mobile` starts both processes together, but it stops the backend when Flutter exits because no device is available. Use `pnpm dev` for the browser simulator at `http://localhost:3000`.
 
 ---
 
