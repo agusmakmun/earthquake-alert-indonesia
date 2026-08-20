@@ -560,6 +560,7 @@ function connectSSE() {
         logConsole("SSE connected. Real-time push listener active.", "info");
         document.getElementById("backend-status").className = "connection-status badge-active";
         document.getElementById("backend-status").innerText = "Backend: Connected";
+        clearOfflineState();
         window.updateDashboardStats?.();
     };
 
