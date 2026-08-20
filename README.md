@@ -23,11 +23,11 @@ The system uses a serverless, database-less architecture designed to run globall
 
 ```text
 ├── backend/                   # Cloudflare Workers backend
-│   ├── index.js               # Main handler (REST endpoints, SSE, Cron)
-│   ├── storage.js             # KV storage abstraction
-│   ├── alertEngine.js         # Proximity & felt area matching logic
-│   ├── bmkg.js                # BMKG API polling & parsing
-│   └── seedData.js            # Indonesian province/city centroids
+│   ├── src/index.js           # Main handler (REST endpoints, SSE, Cron)
+│   ├── src/storage.js         # KV storage abstraction
+│   ├── src/alertEngine.js     # Proximity & felt area matching logic
+│   ├── src/bmkg.js             # BMKG API polling & parsing
+│   └── src/seedData.js         # Indonesian province/city centroids
 │
 ├── frontend/                  # Cross-platform mobile codebase
 │   ├── lib/
@@ -134,7 +134,39 @@ curl -X POST https://YOUR_WORKER_NAME.YOUR_ACCOUNT.workers.dev/api/v1/mock/trigg
 ```
 
 ### Local Development
-During development, run `wrangler dev` to test locally at `http://127.0.0.1:8787`.
+From the repository root:
+
+```bash
+cd backend
+npm install
+```
+
+Create `backend/.dev.vars` for the local webhook secret:
+
+```env
+WEBHOOK_SECRET=local-secret
+```
+
+Start the Worker:
+
+```bash
+npm run dev
+```
+
+It runs at `http://127.0.0.1:8787`. Register a test device, then send an earthquake through the fast webhook path:
+
+```bash
+curl -X POST http://127.0.0.1:8787/api/v1/devices \
+  -H "Content-Type: application/json" \
+  -d '{"installation_id":"test-device","platform":"web","push_token":"test-token"}'
+
+curl -X POST http://127.0.0.1:8787/webhook/earthquake \
+  -H "Authorization: Bearer local-secret" \
+  -H "Content-Type: application/json" \
+  -d '{"id":"local-test-001","magnitude":5.4,"latitude":-6.2,"longitude":106.8,"depth_km":10,"region":"Jakarta","location_description":"Near Jakarta"}'
+```
+
+For a direct alert-engine smoke test, use `/api/v1/mock/trigger` instead. Local KV data is managed by Wrangler and is separate from production KV.
 
 | Endpoint | Method | Description |
 | :--- | :--- | :--- |
